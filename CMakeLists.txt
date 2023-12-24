@@ -2,7 +2,7 @@
 cmake_minimum_required (VERSION 3.8)
 
 # project name
-project(LGFX_SDL LANGUAGES CXX C)
+project(dummy_menu LANGUAGES CXX C)
 
 if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
         set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Choose Release or Debug" FORCE)
@@ -15,7 +15,7 @@ add_definitions(-DLGFX_SDL)
 # Collect LGFX core files and user files
 # NOTE: CONFIGURE_DEPENDS limit the build system dependance, we need to add all used source file here!
 file(GLOB LGFX_SRCS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} CONFIGURE_DEPENDS
-    src/*.cpp
+    menu/*.cpp
     library/LovyanGFX/src/lgfx/Fonts/efont/*.c
     library/LovyanGFX/src/lgfx/Fonts/IPA/*.c
     library/LovyanGFX/src/lgfx/utility/*.c
@@ -29,7 +29,8 @@ file(GLOB LGFX_SRCS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} CONFIGURE_DEPENDS
 add_executable(${PROJECT_NAME} ${LGFX_SRCS})
 target_include_directories(
     ${PROJECT_NAME} PUBLIC
-    ${CMAKE_CURRENT_SOURCE_DIR}/src
+    ${CMAKE_CURRENT_SOURCE_DIR}
+    ${CMAKE_CURRENT_SOURCE_DIR}/menu
     ${CMAKE_CURRENT_SOURCE_DIR}/library/LovyanGFX/src
     )
 
