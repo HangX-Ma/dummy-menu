@@ -36,6 +36,7 @@ using LVAnimInner_t = struct LVAnimInner
 int32_t lvMap(int32_t x, int32_t min_in, int32_t max_in, int32_t min_out, int32_t max_out);
 uint32_t lvBezier3(uint32_t t, uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3);
 
+int32_t lvAnimPathLinear(const LVAnimInner_t *a);
 int32_t lvAnimPathEaseIn(const LVAnimInner_t *a);
 int32_t lvAnimPathEaseOut(const LVAnimInner_t *a);
 int32_t lvAnimPathEaseInOut(const LVAnimInner_t *a);
@@ -43,9 +44,9 @@ int32_t lvAnimPathOvershoot(const LVAnimInner_t *a);
 int32_t lvAnimPathBounce(const LVAnimInner_t *a);
 int32_t lvAnimPathStep(const LVAnimInner_t *a);
 
-static LVAnimPathCallBack_t path_cb_map[6] = {
-    lvAnimPathEaseIn,    lvAnimPathEaseOut, lvAnimPathEaseInOut,
-    lvAnimPathOvershoot, lvAnimPathBounce,  lvAnimPathStep,
+static LVAnimPathCallBack_t path_cb_map[7] = {
+    lvAnimPathLinear,    lvAnimPathEaseIn, lvAnimPathEaseOut, lvAnimPathEaseInOut,
+    lvAnimPathOvershoot, lvAnimPathBounce, lvAnimPathStep,
 };
 
 class LVAnim
@@ -54,7 +55,7 @@ public:
     LVAnim()
         : lv_anim_inner_(LVAnimInner_t{
             .start_value = 0,
-            .current_value = INT32_MIN,
+            .current_value = 0,
             .end_value = 0,
             .duration = 0,
             .act_time = 0,
@@ -69,7 +70,6 @@ public:
     void setValues(int32_t start, int32_t end)
     {
         lv_anim_inner_.start_value = start;
-        lv_anim_inner_.current_value = INT32_MIN;
         lv_anim_inner_.end_value = end;
     }
 

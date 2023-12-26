@@ -70,6 +70,22 @@ uint32_t lvBezier3(uint32_t t, uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u
 
     return v1 + v2 + v3 + v4;
 }
+
+int32_t lvAnimPathLinear(const LVAnimInner_t *a)
+{
+    /*Calculate the current step*/
+    int32_t step = lvMap(a->act_time, 0, a->duration, 0, LV_ANIM_RESOLUTION);
+
+    /*Get the new value which will be proportional to `step`
+     *and the `start` and `end` values*/
+    int32_t new_value;
+    new_value = step * (a->end_value - a->start_value);
+    new_value = new_value >> LV_ANIM_RES_SHIFT;
+    new_value += a->start_value;
+
+    return new_value;
+}
+
 int32_t lvAnimPathEaseIn(const LVAnimInner_t *a)
 {
     /*Calculate the current step*/
