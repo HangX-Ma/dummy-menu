@@ -27,7 +27,7 @@ int randomGenerator(int low, int high)
 
 uint32_t updateTimeStamp() { return SDL_GetTicks(); }
 
-void menuTest1cb(const menu::MenuItem *menu_item)
+void menuTestCallback(const menu::MenuItem *menu_item)
 {
     /* Draw menu */
     canvas->setFont(&fonts::efontCN_24);
@@ -38,10 +38,10 @@ void menuTest1cb(const menu::MenuItem *menu_item)
                        menu_item->getPosition().y);
 }
 
-void menuTest1()
+void menuTestNormal()
 {
     auto *container = new menu::MenuContainer;
-    container->setRenderCallback(menuTest1cb);
+    container->setRenderCallback(menuTestCallback);
 
     int text_width = 12;
     int text_height = 24;
@@ -50,9 +50,74 @@ void menuTest1()
         = {"LCD test", "RTC time", "Brightness", "Buzzer test", "SD test", "Button test"};
 
     for (int i = 0; i < 6; i += 1) {
-        container->addItem(tag_list[i], {10, 10 + (text_height + 2) * text_size * i},
+        container->addItem(tag_list[i],
                            {static_cast<int>(text_width * text_size * tag_list[i].size()),
-                            text_height * text_size});
+                            text_height * text_size},
+                           {10, 10 + (text_height + 2) * text_size * i});
+    }
+
+    while (true) {
+        container->updateAnimValue(updateTimeStamp());
+
+        canvas->clear();
+        container->doRender();
+        canvas->pushSprite(0, 0);
+    }
+
+    // no entry
+    canvas->clear();
+    container->clear(true);
+    delete container;
+}
+
+void menuTestVertical()
+{
+    auto *container = new menu::MenuContainer;
+    container->setRenderCallback(menuTestCallback);
+
+    int text_width = 12;
+    int text_height = 24;
+    int text_size = 1;
+    std::string tag_list[]
+        = {"LCD test", "RTC time", "Brightness", "Buzzer test", "SD test", "Button test"};
+
+    for (int i = 0; i < 6; i += 1) {
+        container->addVItem(tag_list[i],
+                            {static_cast<int>(text_width * text_size * tag_list[i].size()),
+                             text_height * text_size},
+                            {0, text_height});
+    }
+
+    while (true) {
+        container->updateAnimValue(updateTimeStamp());
+
+        canvas->clear();
+        container->doRender();
+        canvas->pushSprite(0, 0);
+    }
+
+    // no entry
+    canvas->clear();
+    container->clear(true);
+    delete container;
+}
+
+void menuTestHorizontal()
+{
+    auto *container = new menu::MenuContainer;
+    container->setRenderCallback(menuTestCallback);
+
+    int text_width = 12;
+    int text_height = 24;
+    int text_size = 1;
+    std::string tag_list[]
+        = {"LCD test", "RTC time", "Brightness", "Buzzer test", "SD test", "Button test"};
+
+    for (int i = 0; i < 6; i += 1) {
+        container->addHItem(tag_list[i],
+                            {static_cast<int>(text_width * text_size * tag_list[i].size()),
+                             text_height * text_size},
+                            {text_width, 0});
     }
 
     while (true) {
@@ -81,4 +146,9 @@ void setup()
     canvas->setFont(&fonts::efontCN_24);
 }
 
-void loop() { menuTest1(); }
+// clang-format off
+void loop() {
+    menuTestNormal();
+    // menuTestVertical();
+    // menuTestHorizontal();
+}

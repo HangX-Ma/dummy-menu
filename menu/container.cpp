@@ -58,7 +58,7 @@ int MenuContainer::addItem(MenuItem *item)
     return item->getId();
 }
 
-int MenuContainer::addItem(std::string tag, Position_t pos, Size_t size, void *user_data)
+int MenuContainer::addItem(std::string tag, Size_t size, Position_t pos, void *user_data)
 {
     auto *item = new MenuItem;
 
@@ -69,6 +69,26 @@ int MenuContainer::addItem(std::string tag, Position_t pos, Size_t size, void *u
     item->setDestination(pos);
 
     return addItem(item);
+}
+
+int MenuContainer::addVItem(std::string tag, Size_t size, Position_t padding, void *user_data)
+{
+    int y = 0;
+    if (!menu_item_list_.empty()) {
+        y = menu_item_list_.back()->getPosition().y + menu_item_list_.back()->getSize().height
+            - this->pos.y + padding.y;
+    }
+    return addItem(std::move(tag), size, {padding.x, y}, user_data);
+}
+
+int MenuContainer::addHItem(std::string tag, Size_t size, Position_t padding, void *user_data)
+{
+    int x = 0;
+    if (!menu_item_list_.empty()) {
+        x = menu_item_list_.back()->getPosition().x + menu_item_list_.back()->getSize().width
+            - this->pos.x + padding.x;
+    }
+    return addItem(std::move(tag), size, {x, padding.y}, user_data);
 }
 
 void MenuContainer::clear(bool free_mem)

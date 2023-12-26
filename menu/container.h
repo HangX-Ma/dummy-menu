@@ -97,7 +97,12 @@ class MenuContainer : public MenuItem
 {
 public:
     int addItem(MenuItem *item);
-    int addItem(std::string tag, Position_t pos, Size_t size, void *user_data = nullptr);
+    int addItem(std::string tag, Size_t size, Position_t pos, void *user_data = nullptr);
+    int addVItem(std::string tag, Size_t size, Position_t padding = {0, 0},
+                 void *user_data = nullptr);
+    int addHItem(std::string tag, Size_t size, Position padding = {0, 0},
+                 void *user_data = nullptr);
+
     size_t size() const { return menu_item_list_.size(); }
     void clear(bool free_mem = false);
     const MenuItem *at(int idx) const { return menu_item_list_.at(idx); }
