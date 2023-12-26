@@ -82,6 +82,9 @@ void Render::render()
 void MenuSelector::gotoItem(int item_id)
 {
     item_id = checkBound(item_id);
+    if (item_id < 0) {
+        return;
+    }
     status.selected = item_id;
     status.changed = true;
 }
@@ -90,7 +93,7 @@ int MenuSelector::checkBound(int item_id)
 {
     int ret = item_id;
     if (menu_container == nullptr) {
-        return ret;
+        return -1;
     }
 
     if (item_id > menu_container->size()) {

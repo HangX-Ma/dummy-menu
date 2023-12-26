@@ -104,8 +104,10 @@ public:
                  void *user_data = nullptr);
 
     size_t size() const { return menu_item_list_.size(); }
+    bool empty() { return menu_item_list_.empty(); }
     void clear(bool free_mem = false);
     const MenuItem *at(int idx) const { return menu_item_list_.at(idx); }
+    const std::vector<MenuItem *> &getMenuItemList() const { return menu_item_list_; }
 
     void setRenderCallback(container::CallbackPtr new_cb) { render_.setRenderCallback(new_cb); };
     void setAnimPathType(container::Type_t type) { render_.setAnimPathType(type); }

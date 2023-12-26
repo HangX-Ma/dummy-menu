@@ -18,7 +18,7 @@ public:
 
 } // namespace scope
 
-class Scope : public MenuSelector
+class MenuScope : public MenuSelector
 {
 public:
     void setSize(Size_t new_size) { size_ = new_size; }
@@ -39,6 +39,12 @@ public:
         if (render_menu) {
             menu_container->doRender();
         }
+    }
+
+    selector::RenderAttribute getRenderAttribute()
+    {
+        auto property = render_.getProperty();
+        return {property.x, property.y, property.width, property.height, status.selected};
     }
 
 private:

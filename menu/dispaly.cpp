@@ -1,10 +1,11 @@
+#include "menu/lv_anim.h"
 #include <random>
 
 #define LGFX_USE_V1
 #include <LovyanGFX.hpp>
 #include <LGFX_AUTODETECT.hpp>
 
-static LGFX lcd(240, 120);
+static LGFX lcd(240, 240);
 
 static LGFX_Sprite *canvas;
 
@@ -23,13 +24,13 @@ int randomGenerator(int low, int high)
     return dist(gen);
 }
 
-#include "menu/container.h"
+#include "menu/menu.h"
 
 uint32_t updateTimeStamp() { return SDL_GetTicks(); }
 
-void menuTestCallback(const menu::MenuItem *menu_item)
+/* ================ CALLBACKS ================ */
+void menuContainerTestCallback(const menu::MenuItem *menu_item)
 {
-    /* Draw menu */
     canvas->setFont(&fonts::efontCN_24);
     canvas->setTextColor(TFT_WHITE);
 
@@ -38,10 +39,47 @@ void menuTestCallback(const menu::MenuItem *menu_item)
                        menu_item->getPosition().y);
 }
 
-void menuTestNormal()
+void menuSelectorTestCallback(int x, int y, int width, int height)
+{
+    canvas->fillSmoothRoundRect(x, y, width, height, 5, TFT_SKYBLUE);
+}
+
+void menuCallback(const std::vector<menu::MenuItem *> &menu_item_list,
+                  const menu::selector::RenderAttribute &selector,
+                  const menu::selector::RenderAttribute &scope)
+{
+    canvas->clear();
+
+    /* Draw selector */
+    canvas->fillSmoothRoundRect(
+        selector.x - scope.x,
+        selector.y - scope.y
+            + (menu_item_list[selector.selected_idx]->getSize().height - selector.height) / 2,
+        selector.width, selector.height, 5, TFT_SKYBLUE);
+    canvas->fillSmoothRoundRect(scope.width - 10 - scope.x, selector.y - scope.y, 10, 24, 2,
+                                TFT_SKYBLUE);
+
+    /* Draw menu */
+    canvas->setFont(&fonts::efontCN_24);
+    canvas->setTextColor(TFT_WHITE);
+
+    for (const auto item : menu_item_list) {
+        canvas->setTextSize(item->getSize().height / 24.0);
+        canvas->drawString(item->getTag().c_str(), item->getPosition().x - scope.x,
+                           item->getPosition().y - scope.y);
+    }
+
+    /* Draw scope */
+    canvas->drawRect(0, 0, scope.width, scope.height, TFT_GREENYELLOW);
+
+    canvas->pushSprite(0, 0);
+}
+
+/* ================ TESTS ================ */
+void menuContainerTestNormal()
 {
     auto *container = new menu::MenuContainer;
-    container->setRenderCallback(menuTestCallback);
+    container->setRenderCallback(menuContainerTestCallback);
 
     int text_width = 12;
     int text_height = 24;
@@ -70,10 +108,10 @@ void menuTestNormal()
     delete container;
 }
 
-void menuTestVertical()
+void menuContainerTestVertical()
 {
     auto *container = new menu::MenuContainer;
-    container->setRenderCallback(menuTestCallback);
+    container->setRenderCallback(menuContainerTestCallback);
 
     int text_width = 12;
     int text_height = 24;
@@ -102,10 +140,10 @@ void menuTestVertical()
     delete container;
 }
 
-void menuTestHorizontal()
+void menuContainerTestHorizontal()
 {
     auto *container = new menu::MenuContainer;
-    container->setRenderCallback(menuTestCallback);
+    container->setRenderCallback(menuContainerTestCallback);
 
     int text_width = 12;
     int text_height = 24;
@@ -134,6 +172,136 @@ void menuTestHorizontal()
     delete container;
 }
 
+void menuSelectorTest()
+{
+    auto *container = new menu::MenuContainer;
+    container->setRenderCallback(menuContainerTestCallback);
+
+    int text_width = 12;
+    int text_height = 24;
+    int text_size = 1;
+    std::string tag_list[]
+        = {"LCD test", "RTC time", "Brightness", "Buzzer test", "SD test", "Button test"};
+
+    for (int i = 0; i < 6; i += 1) {
+        container->addItem(tag_list[i],
+                           {static_cast<int>(text_width * text_size * tag_list[i].size()),
+                            text_height * text_size},
+                           {10, 10 + (text_height + 2) * text_size * i});
+    }
+
+    auto *selector = new menu::MenuSelector;
+    selector->setMenuContainer(container);
+    selector->setRenderCallback(menuSelectorTestCallback);
+    selector->switchSelectorMode(true);
+    while (true) {
+        selector->updateAnimValue(updateTimeStamp());
+        canvas->clear();
+        selector->doRender(true);
+        canvas->pushSprite(0, 0);
+
+        int time_count = 0;
+        if (!lgfx::gpio_in(BTN_DOWN)) {
+            selector->next();
+            while (!lgfx::gpio_in(BTN_DOWN)) {
+
+                selector->updateAnimValue(updateTimeStamp());
+                canvas->clear();
+                selector->doRender(true);
+                canvas->pushSprite(0, 0);
+
+                time_count++;
+                if (time_count > 2000) {
+                    break;
+                }
+            }
+        }
+
+        if (!lgfx::gpio_in(BTN_UP)) {
+            selector->last();
+            while (!lgfx::gpio_in(BTN_UP)) {
+
+                selector->updateAnimValue(updateTimeStamp());
+                canvas->clear();
+                selector->doRender(true);
+                canvas->pushSprite(0, 0);
+
+                time_count++;
+                if (time_count > 2000) {
+                    break;
+                }
+            }
+        }
+
+        if (!lgfx::gpio_in(BTN_RIGHT)) {
+            selector->pressed();
+            while (!lgfx::gpio_in(BTN_RIGHT)) {
+                selector->updateAnimValue(updateTimeStamp());
+                canvas->clear();
+                selector->doRender(true);
+                canvas->pushSprite(0, 0);
+            }
+            selector->released();
+        }
+    }
+}
+
+void menuTest()
+{
+    menu::Menu menu(240, 100);
+    menu.setRenderCallback(menuCallback);
+    menu.switchLoopMode(true);
+
+    int text_width = 12;
+    int text_height = 24;
+    int text_size = 1;
+    std::string tag_list[]
+        = {"LCD test", "RTC time", "Brightness", "Buzzer test", "SD test", "Button test"};
+
+    for (int i = 0; i < 6; i += 1) {
+        menu.getMenu()->addItem(tag_list[i],
+                                {static_cast<int>(text_width * text_size * tag_list[i].size()),
+                                 text_height * text_size},
+                                {10, 10 + (text_height + 2) * text_size * i});
+    }
+
+    while (true) {
+        menu.updateAnimValue(updateTimeStamp());
+
+        int time_count = 0;
+        if (!lgfx::gpio_in(BTN_DOWN)) {
+            menu.next();
+            while (!lgfx::gpio_in(BTN_DOWN)) {
+                menu.updateAnimValue(updateTimeStamp());
+                time_count += 1;
+                if (time_count > 2000) {
+                    break;
+                }
+            }
+        }
+
+        time_count = 0;
+        if (!lgfx::gpio_in(BTN_UP)) {
+            menu.last();
+            while (!lgfx::gpio_in(BTN_UP)) {
+                menu.updateAnimValue(updateTimeStamp());
+                time_count += 1;
+                if (time_count > 2000) {
+                    break;
+                }
+            }
+        }
+
+        if (!lgfx::gpio_in(BTN_RIGHT)) {
+            menu.getSelector()->pressed();
+            while (!lgfx::gpio_in(BTN_RIGHT)) {
+                menu.updateAnimValue(updateTimeStamp());
+            }
+            menu.getSelector()->released();
+        }
+    }
+}
+
 void setup()
 {
     lcd.init();
@@ -148,7 +316,9 @@ void setup()
 
 // clang-format off
 void loop() {
-    menuTestNormal();
-    // menuTestVertical();
-    // menuTestHorizontal();
+    // menuContainerTestNormal();
+    // menuContainerTestVertical();
+    // menuContainerTestHorizontal();
+    menuSelectorTest();
+    // menuTest();
 }
