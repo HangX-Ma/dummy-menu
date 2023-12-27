@@ -27,7 +27,7 @@ public:
     void setSize(Size_t new_size) { size_ = new_size; }
     void updateAnimValue(uint32_t new_time, bool render_immediately = true)
     {
-        render_.update(menu_container, size_, new_time, status.changed);
+        render_.update(menu_container->at(status.selected), size_, new_time, status.changed);
 
         if (status.changed) {
             status.changed = false;

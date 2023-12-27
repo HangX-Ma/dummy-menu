@@ -266,10 +266,11 @@ void menuTest()
         = {"LCD test", "RTC time", "Brightness", "Buzzer test", "SD test", "Button test"};
 
     for (int i = 0; i < 6; i += 1) {
-        menu.getMenu()->addItem(tag_list[i],
-                                {static_cast<int>(text_width * text_size * tag_list[i].size()),
-                                 text_height * text_size},
-                                {10, 10 + (text_height + 2) * text_size * i});
+        menu.getMenuContainer()->addItem(
+            tag_list[i],
+            {static_cast<int>(text_width * text_size * tag_list[i].size()),
+             text_height * text_size},
+            {10, 10 + (text_height + 2) * text_size * i});
     }
 
     while (true) {

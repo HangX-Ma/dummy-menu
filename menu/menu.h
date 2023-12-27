@@ -18,7 +18,7 @@ public:
     explicit Menu(int scope_width = 100, int scope_height = 100);
     ~Menu();
 
-    MenuContainer *getMenu() { return container_; }
+    MenuContainer *getMenuContainer() { return container_; }
     MenuSelector *getSelector() { return selector_; }
     MenuScope *getScope() { return scope_; }
 
