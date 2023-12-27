@@ -10,7 +10,7 @@ namespace menu
 
 using CallbackPtr
     = void (*)(const std::vector<MenuItem *> &menu_item_list,
-               const selector::RenderAttribute &selector, const selector::RenderAttribute &camera);
+               const selector::RenderAttribute &selector, const scope::RenderAttribute &scope);
 
 class Menu
 {

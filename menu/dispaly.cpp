@@ -46,7 +46,7 @@ void menuSelectorTestCallback(int x, int y, int width, int height)
 
 void menuCallback(const std::vector<menu::MenuItem *> &menu_item_list,
                   const menu::selector::RenderAttribute &selector,
-                  const menu::selector::RenderAttribute &scope)
+                  const menu::scope::RenderAttribute &scope)
 {
     canvas->clear();
 
@@ -322,6 +322,6 @@ void loop() {
     // menuContainerTestNormal();
     // menuContainerTestVertical();
     // menuContainerTestHorizontal();
-    menuSelectorTest();
-    // menuTest();
+    // menuSelectorTest();
+    menuTest();
 }

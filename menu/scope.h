@@ -9,11 +9,14 @@ namespace menu
 namespace scope
 {
 
+using RenderAttribute = selector::LVAnimProperty<int32_t>;
+
 class Render : public selector::Render
 {
 public:
     void update(const MenuItem *menu_item, Size_t outsize_box, uint32_t new_time,
                 bool target_changed);
+    void render(Size_t scope_size);
 };
 
 } // namespace scope
@@ -25,6 +28,7 @@ public:
     void updateAnimValue(uint32_t new_time, bool render_immediately = true)
     {
         render_.update(menu_container, size_, new_time, status.changed);
+
         if (status.changed) {
             status.changed = false;
         }
@@ -35,16 +39,16 @@ public:
 
     void doRender(bool render_menu = true)
     {
-        render_.render();
+        render_.render(size_);
         if (render_menu) {
             menu_container->doRender();
         }
     }
 
-    selector::RenderAttribute getRenderAttribute()
+    scope::RenderAttribute getRenderAttribute()
     {
         auto property = render_.getProperty();
-        return {property.x, property.y, property.width, property.height, status.selected};
+        return {property.x, property.y, size_.width, size_.height};
     }
 
 private:

@@ -35,11 +35,11 @@ void Menu::updateAnimValue(uint32_t new_time, bool render_immediately)
 
     if (!trigger_) {
         trigger_ = true;
-        selector_->setAnimCurrentValue(new_time);
-        selector_->front();
         scope_->front();
-        selector_->updateAnimValue(0);
+        selector_->front();
+        selector_->reset(new_time);
     }
+
     container_->updateAnimValue(new_time);
     selector_->updateAnimValue(new_time, false);
     scope_->updateAnimValue(new_time, false);
