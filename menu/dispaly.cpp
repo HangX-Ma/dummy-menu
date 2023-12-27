@@ -194,6 +194,9 @@ void menuSelectorTest()
     selector->setMenuContainer(container);
     selector->setRenderCallback(menuSelectorTestCallback);
     selector->switchSelectorMode(true);
+    selector->reset(updateTimeStamp());
+    selector->setAnimPathType({lvgl::LVAnimPathType::OVERSHOOT, lvgl::LVAnimPathType::OVERSHOOT,
+                               lvgl::LVAnimPathType::OVERSHOOT, lvgl::LVAnimPathType::EASE_OUT});
     while (true) {
         selector->updateAnimValue(updateTimeStamp());
         canvas->clear();

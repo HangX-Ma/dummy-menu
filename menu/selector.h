@@ -39,8 +39,23 @@ public:
     void pressed(const MenuItem *menu_item);
     void release(const MenuItem *menu_item);
 
-    void update(const MenuItem *menu_item, uint32_t new_time, bool target_changed);
+    void update(const MenuItem *menu_item, Position_t prev_pos, uint32_t new_time,
+                bool target_changed);
     void render();
+
+    void reset(uint32_t new_time)
+    {
+        anim.x.setDuration(1);
+        anim.x.setValues(0, 0);
+        anim.y.setDuration(1);
+        anim.y.setValues(0, 0);
+        anim.width.setDuration(0);
+        anim.width.setValues(0, 0);
+        anim.height.setDuration(0);
+        anim.height.setValues(0, 0);
+        current_time = new_time;
+        setAnimCurrentValue(new_time);
+    }
 
     void setRenderCallback(CallbackPtr new_cb) { cb = new_cb; };
     void setAnimPathType(Type_t type) { anim_type = type; }
@@ -69,7 +84,7 @@ protected:
 protected:
     LVAnim_t anim;
     Type_t anim_type{lvgl::LVAnimPathType::EASE_OUT, lvgl::LVAnimPathType::EASE_OUT,
-                     lvgl::LVAnimPathType::OVERSHOOT, lvgl::LVAnimPathType::BOUNCE};
+                     lvgl::LVAnimPathType::OVERSHOOT, lvgl::LVAnimPathType::EASE_OUT};
     Value_t anim_duration{100, 100, 400, 200};
     uint32_t current_time{0};
     CallbackPtr cb{nullptr};
@@ -79,13 +94,15 @@ protected:
 
 using Status_t = struct Status
 {
+    int prev_selected{0};
     int selected{0};
     bool changed{false};
 
     void reset()
     {
+        prev_selected = 0;
         selected = 0;
-        changed = false;
+        changed = true;
     }
 };
 
@@ -96,6 +113,12 @@ public:
     {
         this->menu_container = menu_container;
         status.reset();
+    }
+
+    void reset(uint32_t new_time)
+    {
+        render_.reset(new_time);
+        updateAnimValue(0, true, true);
     }
 
     void last() { gotoItem(status.selected - 1); }
@@ -131,7 +154,9 @@ public:
             return;
         }
 
-        render_.update(menu_container->at(status.selected), new_time, status.changed);
+        render_.update(menu_container->at(status.selected),
+                       menu_container->at(status.prev_selected)->getPosition(), new_time,
+                       status.changed);
 
         // reset status if necessary
         if (status.changed) {

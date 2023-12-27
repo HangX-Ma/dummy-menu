@@ -9,7 +9,7 @@ void Render::pressed(const MenuItem *menu_item)
 {
     auto [width, height] = menu_item->getSize();
 
-    /* Squeeze selector  */
+    /* squeeze selector  */
     anim.width.setPathCallback(anim_type.width);
     anim.width.setDuration(anim_duration.width);
     anim.width.setValues(anim.width.getValue(current_time), width / 4 * 5);
@@ -37,12 +37,9 @@ void Render::release(const MenuItem *menu_item)
     anim.height.setCurrentValue(current_time);
 }
 
-void Render::update(const MenuItem *menu_item, uint32_t new_time, bool target_changed)
+void Render::update(const MenuItem *menu_item, Position_t prev_pos, uint32_t new_time,
+                    bool target_changed)
 {
-    if (isFinished(new_time)) {
-        return;
-    }
-
     if (target_changed) {
         auto [width, height] = menu_item->getSize();
         anim.width.setPathCallback(anim_type.width);
@@ -58,12 +55,12 @@ void Render::update(const MenuItem *menu_item, uint32_t new_time, bool target_ch
         auto [x, y] = menu_item->getPosition();
         anim.x.setPathCallback(anim_type.x);
         anim.x.setDuration(anim_duration.x);
-        anim.x.setValues(anim.x.getValue(new_time), x);
+        anim.x.setValues(prev_pos.x + anim.x.getValue(new_time), x);
         anim.x.setCurrentValue(current_time);
 
         anim.y.setPathCallback(anim_type.y);
         anim.y.setDuration(anim_duration.y);
-        anim.y.setValues(anim.height.getValue(new_time), y);
+        anim.y.setValues(prev_pos.y + anim.height.getValue(new_time), y);
         anim.y.setCurrentValue(current_time);
     }
     current_time = new_time;
@@ -85,6 +82,7 @@ void MenuSelector::gotoItem(int item_id)
     if (item_id < 0) {
         return;
     }
+    status.prev_selected = status.selected;
     status.selected = item_id;
     status.changed = true;
 }
@@ -96,7 +94,7 @@ int MenuSelector::checkBound(int item_id)
         return -1;
     }
 
-    if (item_id > menu_container->size()) {
+    if (item_id > menu_container->size() - 1) {
         ret = loop_mode ? 0 : menu_container->size() - 1;
     }
 
