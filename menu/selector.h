@@ -115,22 +115,34 @@ public:
         status.reset();
     }
 
+    void last() { gotoItem(status.selected - 1); }
+    void next() { gotoItem(status.selected + 1); }
+    void front() { gotoItem(0); }
+    void back()
+    {
+        if (menu_container == nullptr) {
+            return;
+        }
+        if (menu_container->empty()) {
+            return;
+        }
+        gotoItem(menu_container->size() - 1);
+    }
+
+    void switchSelectorMode(bool is_loop) { loop_mode = is_loop; }
+
+    // NOTE: Override the following functions contains `render_` if you inherit `MenuSelector`.
+    //       Because `render_` is private!!!
+    void setRenderCallback(selector::CallbackPtr new_cb) { render_.setRenderCallback(new_cb); };
+    void setAnimPathType(selector::Type_t type) { render_.setAnimPathType(type); }
+    void setAnimDuration(selector::Value_t duration) { render_.setAnimDuration(duration); }
+    void setAnimCurrentValue(uint32_t new_time) { render_.setAnimCurrentValue(new_time); }
+
     void reset(uint32_t new_time)
     {
         render_.reset(new_time);
         updateAnimValue(0, true, true);
     }
-
-    void last() { gotoItem(status.selected - 1); }
-    void next() { gotoItem(status.selected + 1); }
-    void front() { gotoItem(0); }
-    void back() { gotoItem(menu_container->size() - 1); }
-
-    void switchSelectorMode(bool is_loop) { loop_mode = is_loop; }
-    void setRenderCallback(selector::CallbackPtr new_cb) { render_.setRenderCallback(new_cb); };
-    void setAnimPathType(selector::Type_t type) { render_.setAnimPathType(type); }
-    void setAnimDuration(selector::Value_t duration) { render_.setAnimDuration(duration); }
-    void setAnimCurrentValue(uint32_t new_time) { render_.setAnimCurrentValue(new_time); }
 
     void pressed()
     {

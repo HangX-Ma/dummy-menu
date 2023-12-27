@@ -19,21 +19,23 @@ void scope::Render::update(const MenuItem *menu_item, Size_t outside_box, uint32
 
         if (x < anim.x.getValue(new_time)) {
             anim.x.setValues(anim.x.getValue(new_time), x);
+            anim.x.setCurrentValue(current_time);
         }
         else if (x + width > (anim.x.getValue(new_time) + box_width)) {
             anim.x.setValues(anim.x.getValue(new_time), x); // Align Left
+            anim.x.setCurrentValue(current_time);
             // anim.x.setValues(anim.x.getValue(new_time), x - box_width + width); // Align Right
         }
-        anim.x.setCurrentValue(current_time);
 
         if (y < anim.y.getValue(new_time)) {
             anim.y.setValues(anim.y.getValue(new_time), y);
+            anim.y.setCurrentValue(current_time);
         }
         else if (y + height > (anim.y.getValue(new_time) + box_height)) {
             // anim.x.setValues(anim.x.getValue(new_time), y); // Align Up
             anim.y.setValues(anim.y.getValue(new_time), y - box_height + height); // Align Down
+            anim.y.setCurrentValue(current_time);
         }
-        anim.y.setCurrentValue(current_time);
     }
     current_time = new_time;
 }

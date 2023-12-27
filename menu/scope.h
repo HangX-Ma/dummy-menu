@@ -14,7 +14,7 @@ using RenderAttribute = selector::LVAnimProperty<int32_t>;
 class Render : public selector::Render
 {
 public:
-    void update(const MenuItem *menu_item, Size_t outsize_box, uint32_t new_time,
+    void update(const MenuItem *menu_item, Size_t outside_box, uint32_t new_time,
                 bool target_changed);
     void render(Size_t scope_size);
 };

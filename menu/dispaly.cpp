@@ -252,6 +252,10 @@ void menuSelectorTest()
 void menuTest()
 {
     menu::Menu menu(240, 100);
+
+    menu.getScope()->setAnimPathType(
+        {lvgl::LVAnimPathType::OVERSHOOT, lvgl::LVAnimPathType::OVERSHOOT});
+    menu.getScope()->setAnimDuration({400, 400});
     menu.setRenderCallback(menuCallback);
     menu.switchLoopMode(true);
 
