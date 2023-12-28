@@ -32,7 +32,7 @@ cmake --build build -j$(nproc)
 ./build/dummy_menu
 ```
 
-Control the selector movement using arrow key $\uarr$, $\darr$ and $\rarr$.
+Control the selector movement using arrow key &uarr;, &darr; and &rarr;.
 
 ## Concept and Details
 
@@ -56,7 +56,7 @@ menu
 
 ```mermaid
 ---
-title: Dummy Menu
+title: Dummy Menu - namespace menu
 ---
 classDiagram
     Menu o-- MenuContainer
@@ -66,7 +66,7 @@ classDiagram
     MenuItem <|-- MenuContainer
     MenuSelector *-- MenuContainer
     MenuSelector <|-- MenuScope
-namespace menu {
+
     class Menu {
         +updateAnimValue(Args...) void
         +doRender() void
@@ -99,9 +99,14 @@ namespace menu {
         #Size_t size
         #int id
     }
-}
-
-namespace lvgl {
+```
+```mermaid
+---
+title: Dummy Menu - namespace lvgl
+---
+classDiagram
+    LVAnim *-- LVAnimInner_t
+    LVAnim ..> LVAnimPathType
     class LVAnimPathType {
         <<enumeration>>
         LINEAR
@@ -113,7 +118,6 @@ namespace lvgl {
         STEP
         LVANIM_MAX_TYPE
     }
-
     class LVAnimInner_t {
         int32_t start_value;
         int32_t current_value;
@@ -121,12 +125,10 @@ namespace lvgl {
         int32_t duration;
         int32_t act_time;
     }
-
     class LVAnim {
         -LVAnimInner_t lv_anim_inner_
         -LVAnimPathCallBack_t path_cb_
     }
-}
 ```
 </div>
 
