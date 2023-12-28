@@ -45,17 +45,18 @@ void menuSelectorTestCallback(int x, int y, int width, int height)
 }
 
 void menuCallback(const std::vector<menu::MenuItem *> &menu_item_list,
-                  const menu::selector::RenderAttribute &selector,
+                  const menu::selector::RenderAttribute_t &selector,
                   const menu::scope::RenderAttribute &scope)
 {
     canvas->clear();
 
     /* Draw selector */
-    canvas->fillSmoothRoundRect(
-        selector.x - scope.x,
-        selector.y - scope.y
-            + (menu_item_list[selector.selected_idx]->getSize().height - selector.height) / 2,
-        selector.width, selector.height, 5, TFT_SKYBLUE);
+    if (selector.menu_item != nullptr) { // protection
+        canvas->fillSmoothRoundRect(
+            selector.x - scope.x,
+            selector.y - scope.y + (selector.menu_item->getSize().height - selector.height) / 2,
+            selector.width, selector.height, 5, TFT_SKYBLUE);
+    }
     canvas->fillSmoothRoundRect(scope.width - 10 - scope.x, selector.y - scope.y, 10, 24, 2,
                                 TFT_SKYBLUE);
 

@@ -13,21 +13,28 @@ namespace selector
 template <typename T>
 struct LVAnimProperty
 {
-    T x;
-    T y;
-    T width;
-    T height;
+    T x{};
+    T y{};
+    T width{};
+    T height{};
 };
 
-struct RenderAttribute
+template <typename T>
+struct RenderAttribute : public LVAnimProperty<T>
 {
-    int x;
-    int y;
-    int width;
-    int height;
-    int selected_idx;
+    MenuItem *menu_item{nullptr};
+
+    void setAttribute(T x, T y, T width, T height, MenuItem *item)
+    {
+        LVAnimProperty<T>::x = x;
+        LVAnimProperty<T>::y = y;
+        LVAnimProperty<T>::width = width;
+        LVAnimProperty<T>::height = height;
+        menu_item = item;
+    }
 };
 
+using RenderAttribute_t = RenderAttribute<int>;
 using Type_t = LVAnimProperty<lvgl::LVAnimPathType>;
 using Value_t = LVAnimProperty<int32_t>;
 using LVAnim_t = LVAnimProperty<lvgl::LVAnim>;
@@ -188,10 +195,12 @@ public:
         }
     }
 
-    selector::RenderAttribute getRenderAttribute()
+    selector::RenderAttribute_t &getRenderAttribute()
     {
         auto property = render_.getProperty();
-        return {property.x, property.y, property.width, property.height, status.selected};
+        attribute_.setAttribute(property.x, property.y, property.width, property.height,
+                                const_cast<MenuItem *>(menu_container->at(status.selected)));
+        return attribute_;
     }
 
 protected:
@@ -205,6 +214,7 @@ protected:
 
 private:
     selector::Render render_;
+    selector::RenderAttribute_t attribute_;
 };
 
 } // namespace menu
