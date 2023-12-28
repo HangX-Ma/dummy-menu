@@ -37,13 +37,24 @@ public:
         scope_->next();
     }
 
+    void front()
+    {
+        selector_->front();
+        scope_->front();
+    }
+
+    void back()
+    {
+        selector_->back();
+        scope_->back();
+    }
+
     void switchLoopMode(bool is_loop)
     {
         selector_->switchSelectorMode(is_loop);
         scope_->switchSelectorMode(is_loop);
     }
 
-    void setSelectedItem(int idx) { selected_idx_ = idx; }
     void setRenderCallback(CallbackPtr new_cb) { render_cb_ = new_cb; }
 
 private:
@@ -51,7 +62,6 @@ private:
     MenuSelector *selector_{nullptr};
     MenuScope *scope_{nullptr};
     CallbackPtr render_cb_{nullptr};
-    int selected_idx_{0};
     bool trigger_{false};
 };
 

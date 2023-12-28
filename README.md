@@ -1,8 +1,11 @@
-# LGFX simulator SDL
+# Dummy Menu
 
-**LovyanGFX** PC simulator on linux platform with SDL2. Check [LovyanGFX/CMake_SDL](https://github.com/lovyan03/LovyanGFX/tree/master/examples_for_PC/CMake_SDL) for details.
+A menu demo based on LovyanGFX SDL simulator.
+> Thanks for [Forairaaaaa](https://github.com/Forairaaaaa) provided support.
 
-> CMake recommendation ref: [Modern CMake: Do's and Don'ts](https://cliutils.gitlab.io/modern-cmake/chapters/intro/dodonot.html)
+<div class="snek" align="center">
+    <img src="./assets/dummy-menu.gif" alt="dummy menu" width=200 />
+</div>
 
 ## Prerequisite
 
@@ -18,12 +21,122 @@ sudo apt-get install -y build-essential libsdl2-dev
 
 ## Usage
 
+I recommend you use `LLDB` or other debug adapter to run the program. Because the resource management of this program is weak that may result in abnormal program exit after you close the display window. If you stick by it, use `ps -ef | grep dummy_menu` to obtain the **PID** of this running program and kill it using `kill -9 OBTAINED_PID_VALUE`.
+
 ```bash
-git clone https://github.com/HangX-Ma/LGFX-simulator-SDL.git
-cd LGFX-simulator-SDL && git submodule init --update --recursive
+git clone https://github.com/HangX-Ma/dummy-menu.git
+cd dummy-menu && git submodule init --update --recursive
 cmake -B build
 cmake --build build -j$(nproc)
+# run the dummy menu!
+./build/dummy_menu
 ```
+
+Control the selector movement using arrow key $\uarr$, $\darr$ and $\rarr$.
+
+## Concept and Details
+
+```txt
+menu
+├── container.cpp
+├── container.h     ' menu item container
+├── display.cpp     ' SDL simulator setup and loop inner details
+├── lv_anim.cpp
+├── lv_anim.h       ' path animation
+├── menu.cpp
+├── menu.h          ' menu manager
+├── scope.cpp
+├── scope.h         ' menu scope monitor
+├── sdl_main.cpp    ' SDL simulator main
+├── selector.cpp
+└── selector.h      ' menu selector
+```
+
+<div class="dummy menu uml" align="center">
+
+```mermaid
+---
+title: Dummy Menu
+---
+classDiagram
+    Menu o-- MenuContainer
+    Menu o-- MenuSelector
+    Menu o-- MenuScope
+
+    MenuItem <|-- MenuContainer
+    MenuSelector *-- MenuContainer
+    MenuSelector <|-- MenuScope
+namespace menu {
+    class Menu {
+        +updateAnimValue(Args...) void
+        +doRender() void
+        -MenuContainer *container_
+        -MenuSelector *selector_
+        -MenuScope *scope_
+        -CallbackPtr render_cb_
+    }
+    class MenuContainer {
+        +updateAnimValue(Args...) void
+        +doRender() void
+        -std::vector~MenuItem*~ menu_item_list_
+        -container::Render render_
+    }
+    class MenuSelector {
+        +updateAnimValue(Args...) void
+        +doRender(Args...) void
+        -selector::Render render_
+    }
+    class MenuScope {
+        +updateAnimValue(Args...) void
+        +doRender(Args...) void
+        -scope::Render render_
+    }
+    class MenuItem {
+        #void *user_data
+        #std::string tag
+        #Position_t pos
+        #Destination_t des
+        #Size_t size
+        #int id
+    }
+}
+
+namespace lvgl {
+    class LVAnimPathType {
+        <<enumeration>>
+        LINEAR
+        EASE_IN
+        EASE_OUT
+        EASE_IN_OUT
+        OVERSHOOT
+        BOUNCE
+        STEP
+        LVANIM_MAX_TYPE
+    }
+
+    class LVAnimInner_t {
+        int32_t start_value;
+        int32_t current_value;
+        int32_t end_value;
+        int32_t duration;
+        int32_t act_time;
+    }
+
+    class LVAnim {
+        -LVAnimInner_t lv_anim_inner_
+        -LVAnimPathCallBack_t path_cb_
+    }
+}
+```
+</div>
+
+The key structure of this dummy menu is the class `MenuItem` and `LVAnim`. All animation property update and render operations are all based on them. `Menu` manages `MenuSelector`, `MenuScope` and `MenuContainer`. These three managed class have their unique function:
+
+- `MenuSelector`: Point to the current selected menu item. It has four animation path callback functions, `x`, `y`, `width`, `height`. So that it supports smooth movement between different menu items, action animation of **press** or **release** and further extendable features.
+
+- `MenuScope`: This class inherits from `MenuSelector`. It imitates what `MenuSelector` does but monitors the current menu range. If current selected item is out of bound. `MenuScope` will modify the displayed menu items to maintains the number of items in the monitored area.
+
+- `MenuContainer`: Both classes mentioned above owns the same `MenuContainer` because we store the same `MenuContainer`'s pointer in private field. All the animation values update also depending on the `MenuItem` managed by `MenuContainer`. Therefore, functions `updateAnimValue` and `doRender` in fact ask you to give them the info of selected menu item, such as `Size(width, height)`, `Position(x, y)`, `selection changed(or not)` and etc.
 
 ## License
 
