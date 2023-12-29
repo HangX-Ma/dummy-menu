@@ -1,6 +1,6 @@
 # Dummy Menu
 
-A menu demo based on LovyanGFX SDL simulator.
+A menu demo based on LovyanGFX SDL simulator. Easing animation functions use the [lvgl](https://github.com/lvgl) `anim` content, packaged and simplified in this project.
 > Thanks for [Forairaaaaa](https://github.com/Forairaaaaa) provided support.
 
 <div class="snek" align="center">
@@ -132,13 +132,14 @@ classDiagram
 ```
 </div>
 
-The key structure of this dummy menu is the class `MenuItem` and `LVAnim`. All animation property update and render operations are all based on them. `Menu` manages `MenuSelector`, `MenuScope` and `MenuContainer`. These three managed class have their unique function:
+The key structure of this dummy menu is the class `MenuItem` and `LVAnim`, which are the base of animation property update and render operations. `Menu` manages `MenuSelector`, `MenuScope` and `MenuContainer`. The three managed class have their unique role:
 
-- `MenuSelector`: Point to the current selected menu item. It has four animation path callback functions, `x`, `y`, `width`, `height`. So that it supports smooth movement between different menu items, action animation of **press** or **release** and further extendable features.
+- `MenuSelector`: Point to the current selected menu item. It has four animation path callback functions, `x`, `y`, `width`, `height`. So that it supports smooth movement between different menu items, action animation of **press** or **release**, and further extendable features.
 
-- `MenuScope`: This class inherits from `MenuSelector`. It imitates what `MenuSelector` does but monitors the current menu range. If current selected item is out of bound. `MenuScope` will modify the displayed menu items to maintains the number of items in the monitored area.
+- `MenuScope`: This class inherits from `MenuSelector`. It imitates what `MenuSelector` does but also monitors the current menu area. If current selected item is out of bound, `MenuScope` will modify the displayed menu items to maintains the fixed number of items in the monitored area.
 
-- `MenuContainer`: Both classes mentioned above owns the same `MenuContainer` because we store the same `MenuContainer`'s pointer in private field. All the animation values update also depending on the `MenuItem` managed by `MenuContainer`. Therefore, functions `updateAnimValue` and `doRender` in fact ask you to give them the info of selected menu item, such as `Size(width, height)`, `Position(x, y)`, `selection changed(or not)` and etc.
+- `MenuContainer`: Both classes mentioned above owns the same `MenuContainer` because we store the same `MenuContainer`'s pointer in their private field. Animation value update also depends on the `MenuItem` that managed by `MenuContainer`. Therefore, functions `updateAnimValue` and `doRender` in fact ask you to give them the info of selected menu item, such as `Size(width, height)`, `Position(x, y)`, `selection changed(or not)` and etc.
+> `LVAnim` actually copy the main structure and content of `lvgl`. If you want to learn more about it, look at [lv_anim.h](https://github.com/lvgl/lvgl/blob/master/src/misc/lv_anim.h) and [lv_anim.c](https://github.com/lvgl/lvgl/blob/master/src/misc/lv_anim.c). I also recommend you take a glance of [easings.net](https://easings.net/).
 
 ## License
 
