@@ -1,6 +1,6 @@
 # Dummy Menu
 
-A menu demo based on LovyanGFX SDL simulator.
+A menu demo based on LovyanGFX SDL simulator. You can also use the **Menu** as a static or shared library.
 
 Easing animation functions use the [lvgl](https://github.com/lvgl) `anim` content, packaged and simplified in this project.
 > Thanks for [Forairaaaaa](https://github.com/Forairaaaaa) provided support.
@@ -23,6 +23,8 @@ sudo apt-get install -y build-essential libsdl2-dev
 
 ## Usage
 
+### Build as simulator
+
 I recommend you use `LLDB` or other debug adapter to run the program. Because the resource management of this program is weak that may result in abnormal program exit after you close the display window. If you stick by it, use `ps -ef | grep dummy_menu` to obtain the **PID** of this running program and kill it using `kill -9 OBTAINED_PID_VALUE`.
 
 ```bash
@@ -35,6 +37,48 @@ cmake --build build -j$(nproc)
 ```
 
 Control the selector movement using arrow key &uarr;, &darr; and &rarr;.
+
+### Build as library
+
+- Add this repository as one of your submodules.
+
+    ```bash
+    # add this repo into your library path
+    git submodule add https://github.com/HangX-Ma/dummy-menu.git library/menu
+    ```
+
+- Your `.gitmodules` will add following contents.
+
+    ```bash
+    [submodule "library/menu"]
+        path = library/menu
+        url = https://github.com/HangX-Ma/dummy-menu.git
+    ```
+
+- Add the `menu` as subdirectory in your `library/CMakeLists.txt`.
+
+    ```bash
+    cmake_minimum_required(VERSION 3.14)
+    project(library)
+    add_subdirectory(menu)
+    ```
+    > Don't forget to make `library/CMakeLists.txt` valid in your main project CMakeLists.txt.
+
+- Use `target_link_libraries` command in `CMakeLists.txt` to add this library as dependence.
+
+    ```bash
+    target_link_libraries(${TARGET_NAME} menu::menu)
+    ```
+
+- There are some options that you can use for CMake configuration.
+
+    ```cmake
+    # build shared option
+    option(SIMPLEKV_BUILD_SHARED "Build shared library" OFF)
+
+    # build position independent code
+    option(SIMPLEKV_BUILD_PIC "Build position independent code (-fPIC)" OFF)
+    ```
 
 ## Concept and Details
 
@@ -141,6 +185,7 @@ The key structure of this dummy menu is the class `MenuItem` and `LVAnim`, which
 - `MenuScope`: This class inherits from `MenuSelector`. It imitates what `MenuSelector` does but also monitors the current menu area. If current selected item is out of bound, `MenuScope` will modify the displayed menu items to maintains the fixed number of items in the monitored area.
 
 - `MenuContainer`: Both classes mentioned above owns the same `MenuContainer` because we store the same `MenuContainer`'s pointer in their private field. Animation value update also depends on the `MenuItem` that managed by `MenuContainer`. Therefore, functions `updateAnimValue` and `doRender` in fact ask you to give them the info of selected menu item, such as `Size(width, height)`, `Position(x, y)`, `selection changed(or not)` and etc.
+
 > `LVAnim` actually copy the main structure and content of `lvgl`. If you want to learn more about it, look at [lv_anim.h](https://github.com/lvgl/lvgl/blob/master/src/misc/lv_anim.h) and [lv_anim.c](https://github.com/lvgl/lvgl/blob/master/src/misc/lv_anim.c). I also recommend you take a glance of [easings.net](https://easings.net/).
 
 ## License

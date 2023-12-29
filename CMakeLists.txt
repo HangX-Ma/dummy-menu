@@ -1,52 +1,23 @@
-# See how to install sdl2: https://wiki.libsdl.org/SDL2/Installation
-cmake_minimum_required (VERSION 3.8)
+cmake_minimum_required(VERSION 3.14)
 
-# project name
-project(dummy_menu LANGUAGES CXX C)
+project(menu_builder)
 
-if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
-        set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Choose Release or Debug" FORCE)
+if(NOT DEFINED MENU_MASTER_PROJECT)
+    if(CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
+        set(MENU_MASTER_PROJECT ON)
+        message(STATUS "Build part: master-project")
+    else()
+        set(MENU_MASTER_PROJECT OFF)
+        message(STATUS "Build part: sub-porject")
+    endif()
 endif()
 
-set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+option(BUILD_MENU_SIMULATOR "Build as menu SDL simulator" ${MENU_MASTER_PROJECT})
 
-add_definitions(-DLGFX_SDL)
-
-# Collect LGFX core files and user files
-# NOTE: CONFIGURE_DEPENDS limit the build system dependance, we need to add all used source file here!
-file(GLOB LGFX_SRCS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} CONFIGURE_DEPENDS
-    menu/*.cpp
-    library/LovyanGFX/src/lgfx/Fonts/efont/*.c
-    library/LovyanGFX/src/lgfx/Fonts/IPA/*.c
-    library/LovyanGFX/src/lgfx/utility/*.c
-    library/LovyanGFX/src/lgfx/v1/*.cpp
-    library/LovyanGFX/src/lgfx/v1/misc/*.cpp
-    library/LovyanGFX/src/lgfx/v1/panel/Panel_Device.cpp
-    library/LovyanGFX/src/lgfx/v1/panel/Panel_FrameBufferBase.cpp
-    library/LovyanGFX/src/lgfx/v1/platforms/sdl/*.cpp
-    )
-
-add_executable(${PROJECT_NAME} ${LGFX_SRCS})
-target_include_directories(
-    ${PROJECT_NAME} PUBLIC
-    ${CMAKE_CURRENT_SOURCE_DIR}
-    ${CMAKE_CURRENT_SOURCE_DIR}/library/LovyanGFX/src
-    )
-
-find_package(SDL2 REQUIRED SDL2)
-if (SDL2_FOUND)
-    message(STATUS "Packaged version of SDL2 will be used.")
+if(BUILD_MENU_SIMULATOR)
+    message(STATUS "Build as menu SDL simulator")
+    include(cmake/sdl_simulator.cmake)
 else()
-    message(STATUS "Bundled version of SDL2 will be downloaded and used.")
-    include(FetchContent)
-    FetchContent_Declare(
-        SDL2
-        GIT_REPOSITORY  https://github.com/libsdl-org/SDL.git
-        GIT_TAG         5773c347d58d07a45b33ac4ecc93fd3e6a86d483
-    )
-    FetchContent_MakeAvailable(SDL2)
-    set(SDL2_LIBRARIES ${SDL2_LIBRARIES} SDL2main SDL2-static SDL2_image-static)
+    message(STATUS "Build as menu library")
+    include(cmake/libmenu.cmake)
 endif()
-include_directories(${SDL2_INCLUDE_DIRS})
-target_link_libraries(${PROJECT_NAME} -lpthread ${SDL2_LIBRARIES})
-target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_17)
