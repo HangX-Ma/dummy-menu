@@ -1,6 +1,8 @@
 # Dummy Menu
 
-A menu demo based on LovyanGFX SDL simulator. Easing animation functions use the [lvgl](https://github.com/lvgl) `anim` content, packaged and simplified in this project.
+A menu demo based on LovyanGFX SDL simulator.
+
+Easing animation functions use the [lvgl](https://github.com/lvgl) `anim` content, packaged and simplified in this project.
 > Thanks for [Forairaaaaa](https://github.com/Forairaaaaa) provided support.
 
 <div class="snek" align="center">
