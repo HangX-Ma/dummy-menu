@@ -29,7 +29,7 @@ I recommend you use `LLDB` or other debug adapter to run the program. Because th
 
 ```bash
 git clone https://github.com/HangX-Ma/dummy-menu.git
-cd dummy-menu && git submodule init --update --recursive
+cd dummy-menu && git submodule update --init --recursive
 cmake -B build
 cmake --build build -j$(nproc)
 # run the dummy menu!
